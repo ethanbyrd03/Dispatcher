@@ -366,16 +366,14 @@ unsigned int swap(unsigned int pid_1, unsigned int pid_2) {
     struct task_struct* node_1 = NULL;
     struct task_struct* node_2 = NULL;
     struct task_struct* current = head;
-    while (current != NULL) {
+    while (current != NULL || (node_1 != NULL && node_2 != NULL)) {
         if (current->pid == pid_1) {
             node_1 = current;
         } else if (current->pid == pid_2) {
             node_2 = current;
         }
         current = current->next;
-        if (node_1 != NULL && node_2 != NULL) {
-            break;
-        }
+        
     }
     if (node_1 == NULL || node_2 == NULL) {
         return TASK_OP_ERROR;
