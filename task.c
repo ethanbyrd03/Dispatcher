@@ -1,4 +1,4 @@
-// PID: 9DigitPidNoSpacesOrDashes
+// PID: 730481481
 // I pledge the COMP211 honor code.
 
 // -----------------------------------
@@ -37,8 +37,14 @@ task_struct* tail = NULL;
 //      None
 
 void clear() {
-  // TODO: Complete the code
-
+    struct task_struct* current = head;
+    struct task_struct* next;
+    while (current != NULL) {
+        next = current->next;
+        free(current);
+        current = next;}
+    head = NULL;
+    
 } // end clear() function
 
 // ------------------------------------
@@ -54,12 +60,12 @@ void clear() {
 //      non-negative integer value (if 0, then the list is empty)
 
 unsigned int size() {
-
-  // TODO: Complete the code
-  // and return the correct 
-  // integer value
-  
-  return 0; // this is just a place holder 
+    unsigned int i = 0;
+    struct task_struct* current = head;
+    while (current!=NULL) {
+        i++;
+        current = current->next;}
+    return i; 
 
 } // end size() function
 
@@ -85,13 +91,32 @@ unsigned int size() {
 //                      i.e., duplicate pid in the linked list
 
 unsigned int append_task(unsigned int pid, unsigned int priority, int cycles) {
-
-  // TODO: Complete the code
-  // and return the correct 
-  // integer value
-  
-  return 0; // this is just a place holder 
-
+    struct task_struct* current = head;
+    while (current != NULL) {
+        if (current->pid == pid) {
+             return TASK_OP_ERROR;
+        }
+        current = current->next;
+    }
+    struct task_struct* newTask = (struct task_struct*)malloc(sizeof(struct task_struct));
+    if (newTask == NULL) {
+        return TASK_OP_ERROR;
+    }
+    newTask->pid = pid;
+    newTask->priority = priority;
+    newTask->remaining_cycles = cycles;
+    newTask->next = NULL;
+    if (head == NULL) {
+        head = newTask;
+    } 
+    else {
+        struct task_struct* last = head;
+        while (last->next != NULL) {
+            last = last->next;
+        }
+        last->next = newTask;
+    }
+    return TASK_OP_PASS;
 } // end append_task() function
 
 // ------------------------------------
@@ -123,13 +148,37 @@ unsigned int append_task(unsigned int pid, unsigned int priority, int cycles) {
 
 unsigned int insert_task(unsigned int index, unsigned int pid,
                          unsigned int priority, int cycles) {
-
-  // TODO: Complete the code
-  // and return the correct 
-  // integer value
-  
-  return 0; // this is just a place holder 
-
+    struct task_struct* current = head;
+    while (current != NULL) {
+        if (current->pid == pid) {
+            return TASK_OP_ERROR;
+        }
+        current = current->next;
+    }
+    unsigned int listSize = size();
+    if (index > listSize) {
+       return TASK_OP_ERROR;
+    }
+    struct task_struct* newTask = (struct task_struct*)malloc(sizeof(struct task_struct));
+    if (newTask == NULL) { 
+       return TASK_OP_ERROR;
+    }
+    newTask->pid = pid;
+    newTask->priority = priority;
+    newTask->remaining_cycles = cycles;
+    if (index == 0) {
+        newTask->next = head;
+        head = newTask;
+    } 
+    else {
+        struct task_struct* current = head;
+        for (unsigned int i = 0; i < index - 1; i++) {
+            current = current->next;
+        }
+        newTask->next = current->next;
+        current->next = newTask;
+    }
+    return TASK_OP_PASS;
 } // end insert_task() function
 
 // ------------------------------------
@@ -154,11 +203,39 @@ unsigned int insert_task(unsigned int index, unsigned int pid,
 
 unsigned int set_task(unsigned int index, unsigned int pid) {
 
-  // TODO: Complete the code
-  // and return the correct 
-  // integer value
-  
-  return 0; // this is just a place holder 
+    unsigned int listSize = size();
+    if (index >= listSize) {
+        return TASK_OP_ERROR;
+    }
+    struct task_struct* current = head;
+    struct task_struct* prev = NULL;
+
+    while (current != NULL && current->pid != pid) {
+        prev = current;
+        current = current->next;
+    }
+    if (current == NULL) {
+        return TASK_OP_ERROR;
+    }
+    if (prev == NULL) {
+        head = current->next;
+    } else {
+        prev->next = current->next;
+    }
+    current->next = NULL;
+
+    if (index == 0) {
+        current->next = head;
+        head = current;
+    } else {
+        struct task_struct* temp = head;
+        for (unsigned int i = 0; i < index - 1; i++) {
+            temp = temp->next;
+        }
+        current->next = temp->next;
+        temp->next = current;
+    }
+    return TASK_OP_PASS; 
 
 } // end set_task() function
 
@@ -183,13 +260,23 @@ unsigned int set_task(unsigned int index, unsigned int pid) {
 //      task_stuct*:	if the operation is successful
 //      NULL:	if the pid is not in the linked list
 
-task_struct* remove_task(unsigned int pid) {
+task_struct* remove_task(unsigned int pid){
+    struct task_struct* current = head;
+    struct task_struct* prev = NULL;
 
-  // TODO: Complete the code
-  // and return the correct 
-  // pointer value
-  
-  return NULL; // this is just a place holder 
+    while (current != NULL && current->pid != pid) {
+        prev = current;
+        current = current->next;
+    }
+    if (current == NULL) {
+        return NULL;
+    }
+    if (prev == NULL) {
+        head = current->next;
+    } else {
+        prev->next = current->next;
+    }
+    return current;
 
 } // end remove_task() function
 
@@ -211,13 +298,14 @@ task_struct* remove_task(unsigned int pid) {
 //      NULL:	pid is not in the linked list
 
 task_struct* exists(unsigned int pid) {
-
-  // TODO: Complete the code
-  // and return the correct 
-  // pointer value
-  
-  return NULL; // this is just a place holder 
-
+    struct task_struct* current = head;
+    while (current != NULL) {
+        if (current->pid == pid) {
+            return current;
+        }
+        current = current->next;
+    }
+    return NULL;
 } // end exists() function
 
 // ------------------------------------
@@ -238,13 +326,16 @@ task_struct* exists(unsigned int pid) {
 //      NULL:	index is out of range ( index < 0 || index >= size() )
 
 task_struct* get_task(unsigned int index) {
+    unsigned int listSize = size();
+    if (index >= listSize) {
+        return NULL;
+    }
+    struct task_struct* current = head;
 
-  // TODO: Complete the code
-  // and return the correct 
-  // pointer value
-  
-  return NULL; // this is just a place holder 
-
+    for (unsigned int i = 0; i < index; i++) {
+        current = current->next;
+    }
+    return current;
 } // end get_task() function
 
 // ------------------------------------
@@ -269,13 +360,44 @@ task_struct* get_task(unsigned int index) {
 //
 
 unsigned int swap(unsigned int pid_1, unsigned int pid_2) {
+    if (pid_1 == pid_2) {
+        return TASK_OP_ERROR;
+    }
+    struct task_struct* node_1 = NULL;
+    struct task_struct* node_2 = NULL;
+    struct task_struct* current = head;
+    while (current != NULL) {
+        if (current->pid == pid_1) {
+            node_1 = current;
+        } else if (current->pid == pid_2) {
+            node_2 = current;
+        }
+        current = current->next;
+        if (node_1 != NULL && node_2 != NULL) {
+            break;
+        }
+    }
+    if (node_1 == NULL || node_2 == NULL) {
+        return TASK_OP_ERROR;
+    }
+    struct task_struct* temp = node_1->next;
+    node_1->next = node_2->next;
+    node_2->next = temp;
 
-  // TODO: Complete the code
-  // and return the correct 
-  // integer value
-  
-  return 0; // this is just a place holder 
+    if (node_1 == head) {
+        head = node_2;
+    } else if (node_2 == head) {
+        head = node_1;
+    } else {
+        current = head;
+        while (current->next != node_1 && current->next != node_2) {
+            current = current->next;
+        }
 
+        current->next = (current->next == node_1) ? node_2 : node_1;
+    }
+
+    return TASK_OP_PASS;
 } // end swap() function
 
 // ------------------------------------
@@ -291,11 +413,34 @@ unsigned int swap(unsigned int pid_1, unsigned int pid_2) {
 //  Return:
 //      None
 //
+void minHeapify(struct task_struct* root) {
+    struct task_struct* smallest = root;
+    struct task_struct* leftChild = root->next;
+    struct task_struct* rightChild = (leftChild != NULL) ? leftChild->next : NULL;
+    if (leftChild != NULL && leftChild->priority < smallest->priority) {
+        smallest = leftChild;
+    }
+    if (rightChild != NULL && rightChild->priority < smallest->priority) {
+        smallest = rightChild;
+    }
+    if (smallest != root) {
+        unsigned int temp = root->priority;
+        root->priority = smallest->priority;
+        smallest->priority = temp;
+        minHeapify(smallest);
+    }
+}
+
+void buildMinHeap() {   
+    struct task_struct* current = head;
+    while (current != NULL) {
+        minHeapify(current);
+        current = current->next;
+    }
+}
 
 void schedule() {
-
-  // TODO: Complete the code
-
+     buildMinHeap();
 } // end schedule() function
 
 // ------------------------------------
