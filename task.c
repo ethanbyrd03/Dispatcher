@@ -483,5 +483,3 @@ int compare_floats(float a, float b) {
     const float epsilon = 0.0001;
     return fabs(a - b) < epsilon ? 0 : a < b ? 1 : -1;
 } // end compare_floats() function
-// PID: 730481481
-} // end compare_floats() function
