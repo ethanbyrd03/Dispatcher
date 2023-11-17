@@ -396,28 +396,33 @@ unsigned int swap(unsigned int pid_1, unsigned int pid_2) {
 //      None
 //
 void minHeapify(struct task_struct* root) {
-    struct task_struct* smallest = root;
-    struct task_struct* leftChild = root->next;
-    struct task_struct* rightChild = (leftChild != NULL) ? leftChild->next : NULL;
-    if (leftChild != NULL && leftChild->priority < smallest->priority) {
-        smallest = leftChild;
+    if (root == NULL) {
+        return;
     }
-    if (rightChild != NULL && rightChild->priority < smallest->priority) {
-        smallest = rightChild;
+    struct task_struct* smallest = root;
+    struct task_struct* left = root->next;
+    struct task_struct* right = left != NULL ? left->next : NULL;
+    if (left != NULL && left->priority < smallest->priority) {
+        smallest = left;
+    }
+    if (right != NULL && right->priority < smallest->priority) {
+        smallest = right;
     }
     if (smallest != root) {
-        unsigned int temp = root->priority;
-        root->priority = smallest->priority;
-        smallest->priority = temp;
+        swap(root->pid, smallest->pid);
         minHeapify(smallest);
     }
 }
 
 void buildMinHeap() {   
-    struct task_struct* current = head;
-    while (current != NULL) {
+    int i;
+    struct task_struct* current;
+    for (i = size() / 2 - 1; i >= 0; i--) {
+        current = head;
+        for (int j = 0; j < i; j++) {
+            current = current->next;
+        }
         minHeapify(current);
-        current = current->next;
     }
 }
 
