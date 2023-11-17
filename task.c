@@ -363,38 +363,22 @@ unsigned int swap(unsigned int pid_1, unsigned int pid_2) {
     if (pid_1 == pid_2) {
         return TASK_OP_ERROR;
     }
-    struct task_struct* node_1 = NULL;
-    struct task_struct* node_2 = NULL;
-    struct task_struct* current = head;
-    while (current != NULL || (node_1 != NULL && node_2 != NULL)) {
-        if (current->pid == pid_1) {
-            node_1 = current;
-        } else if (current->pid == pid_2) {
-            node_2 = current;
-        }
-        current = current->next;
-        
-    }
+    struct task_struct* node_1 = exists(pid_1);
+    struct task_struct* node_2 = exists(pid_2);
     if (node_1 == NULL || node_2 == NULL) {
         return TASK_OP_ERROR;
     }
-    struct task_struct* temp = node_1->next;
-    node_1->next = node_2->next;
-    node_2->next = temp;
+    int temp_cycles = node_1->remaining_cycles;
+    node_1->remaining_cycles = node_2->remaining_cycles;
+    node_2->remaining_cycles = temp_cycles;
 
-    if (node_1 == head) {
-        head = node_2;
-    } else if (node_2 == head) {
-        head = node_1;
-    } else {
-        current = head;
-        while (current->next != node_1 && current->next != node_2) {
-            current = current->next;
-        }
+    unsigned int temp_priority = node_1->priority;
+    node_1->priority = node_2->priority;
+    node_2->priority = temp_priority;
 
-        current->next = (current->next == node_1) ? node_2 : node_1;
-    }
-
+    unsigned int temp_pid = pid_1;
+    node_1->pid = pid_2;
+    node_2->pid = temp_pid;
     return TASK_OP_PASS;
 } // end swap() function
 
@@ -498,4 +482,6 @@ void print_tasks() {
 int compare_floats(float a, float b) {
     const float epsilon = 0.0001;
     return fabs(a - b) < epsilon ? 0 : a < b ? 1 : -1;
+} // end compare_floats() function
+// PID: 730481481
 } // end compare_floats() function
