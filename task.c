@@ -402,17 +402,20 @@ void minHeapify(struct task_struct* root) {
     struct task_struct* smallest = root;
     struct task_struct* left = root->next;
     struct task_struct* right = left != NULL ? left->next : NULL;
-    if (left != NULL && left->priority < smallest->priority) {
-        smallest = left;
+    if (left != NULL) {
+        float priority_left = (float)left->priority / left->remaining_cycles;
+        float priority_smallest = (float)smallest->priority / smallest->remaining_cycles;
+        if (compare_floats(priority_left, priority_smallest) ? left->priority < smallest->priority : priority_left < priority_smallest) {
+            smallest = left;
+        }
     }
-    if (right != NULL && right->priority < smallest->priority) {
-        smallest = right;
-    }
-    if (smallest != root) {
-        swap(root->pid, smallest->pid);
-        minHeapify(smallest);
-    }
-}
+    if (right != NULL) {
+        float priority_right = (float)right->priority / right->remaining_cycles;
+        float priority_smallest = (float)smallest->priority / smallest->remaining_cycles;
+        if (compare_floats(priority_right, priority_smallest) ? right->priority < smallest->priority : priority_right < priority_smallest) {
+            smallest = right;
+        }
+}}
 
 void buildMinHeap() {   
     int i;
