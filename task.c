@@ -405,14 +405,12 @@ void schedule() {
             int j = 2 * index + 1;
             float prioChild = (float) get_task(j)->priority / (float) get_task(j)->remaining_cycles;
             if (j + 1 < size()) {
-                struct task_struct* child2 = get_task(j + 1);
-                float prioChild2 = (float) child2->priority/ (float) child2->remaining_cycles;
-                int o = compare_floats(prioChild, prioChild2);
-                if (o == -1) {
+                float prioChild2 = (float) get_task(j+1)->priority/ (float) get_task(j+1)->remaining_cycles;
+                if (compare_floats(prioChild, prioChild2) == -1) {
                     prioChild = prioChild2;
                     j = j + 1;
                 }
-                else if (o == 0 && get_task(j)->priority > child2->priority) {
+                else if (compare_floats(prioChild, prioChild2) == 0 && get_task(j)->priority > get_task(j+1)->priority) {
                     prioChild = prioChild2;
                     j = j + 1;
                 }   
