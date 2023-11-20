@@ -33,7 +33,8 @@ void dispatcher(unsigned int cycles_per_task) {
     schedule();
     int headIndex = 0;
     while (size() > 0) {
-        struct task_struct* currentTask = remove_task(get_task(headIndex)->pid);
+        struct task_struct* currentTask = get_task(headIndex);
+        remove_task(currentTask->pid);
         if (currentTask == NULL) {
         return;}
         run(currentTask, cycles_per_task);
