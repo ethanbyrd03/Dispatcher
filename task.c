@@ -398,7 +398,7 @@ unsigned int swap(unsigned int pid_1, unsigned int pid_2) {
 void schedule() {
     if (size() == 1 || size() == 0) {
     return;} 
-    for (int i = ((size()-2) / 2); i <= 0; i--) {
+    for (int i = (floor(size()-2) / 2); i >= 0; i--) {
         int index = i;
         float v = (float) get_task(index)->priority / (float) get_task(index) -> remaining_cycles;
         while (2*index+2 <= size()) {
