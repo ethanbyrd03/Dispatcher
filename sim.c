@@ -65,7 +65,7 @@ void run(task_struct* task, unsigned int num_cycles) {
     if (task == NULL) {
     return;}
     task->remaining_cycles -= num_cycles;
-    printf("%s%d%s%d%s\n", "Task ", task->pid, " run for ", num_cycles, " cycle(s)."); 
+    printf("%s%d%s%d%s\n", "Task ", task->pid, " ran for ", num_cycles, " cycle(s)."); 
     if (task->remaining_cycles <= 0) {
         printf("%s%d%s\n", "Task ", task->pid, " Completed.");
     }
