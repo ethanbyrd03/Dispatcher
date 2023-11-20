@@ -36,7 +36,7 @@ void dispatcher(unsigned int cycles_per_task) {
         struct task_struct* currentTask = remove_task(get_task(headIndex)->pid);
         if (currentTask == NULL) {
         return;}
-        currentTask->remaining_cycles = currentTask->remaining_cycles - cycles_per_task;
+        run(currentTask, cycles_per_task);
         if (currentTask->remaining_cycles > 0) {
            append_task(currentTask->pid, currentTask->priority, currentTask->remaining_cycles);
         }
@@ -62,14 +62,10 @@ void dispatcher(unsigned int cycles_per_task) {
 
 void run(task_struct* task, unsigned int num_cycles) {
     if (task == NULL) {
-        return;
-    }
+    return;}
+    task->remaining_cycles -= num_cycles;
+    printf("%s%d%s%d%s\n", "Task ", task->pid, " run for ", num_cycles, " cycle(s)."); 
     if (task->remaining_cycles <= 0) {
-        return;
+        printf("%s%d%s\n", "Task ", task->pid, " Completed.");
     }
-    if (num_cycles >= (unsigned) task->remaining_cycles) {
-        task->remaining_cycles = 0;
-    } else {
-        task->remaining_cycles -= num_cycles;
-    } 
 } // end run() function
