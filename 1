@@ -395,34 +395,96 @@ unsigned int swap(unsigned int pid_1, unsigned int pid_2) {
 //  Return:
 //      None
 //
-void schedule() {
-     for (int i = ((size()-2) / 2); i <= 0; i--) {
-        int index = i;
-        float v = (float) get_task(index)->priority / (float) get_task(index) -> remaining_cycles;
-        while (2*index+2 <= size()) {
-            int j = 2 * index + 1;
-            float prioChild = (float) get_task(j)->priority / (float) get_task(j)->remaining_cycles;
-            if (j + 1 < size()) {
-                struct task_struct* child2 = get_task(j + 1);
-                float prioChild2 = (float) child2->priority/ (float) child2->remaining_cycles;
-                int o = compare_floats(prioChild, prioChild2);
-                if (o == -1) {
-                    prioChild = prioChild2;
-                    j = j + 1;
-                }
-                else if (o == 0 && get_task(j)->priority > child2->priority) {
-                    prioChild = prioChild2;
-                    j = j + 1;
-                }   
-            }
-            if (compare_floats(v, prioChild) == 1 || (compare_floats(v, prioChild) == 0 && get_task(j)->priority >= get_task(index)->priority)) {
-            break;}
-            else {
-                swap(get_task(index)->pid, get_task(j)->pid);
-                index = j;
-            }
+void minHeapify(struct task_struct* root) {
+    if (root == NULL) {
+        return;
+    }
+   /* struct task_struct* smallest = root;
+    struct task_struct* left = root->next;
+    struct task_struct* right = left != NULL ? left->next : NULL; */
+    struct task_struct* current = root;
+    /*if (left != NULL) {
+        float priority_left = (float)left->priority / left->remaining_cycles;
+        float priority_smallest = (float)smallest->priority / smallest->remaining_cycles;
+
+        if (compare_floats(priority_left, priority_smallest) ? left->priority < smallest->priority : priority_left < priority_smallest) {
+            smallest = left;
         }
-     }
+    }
+    if (right != NULL) {
+        float priority_right = (float)right->priority / right->remaining_cycles;
+        float priority_smallest = (float)smallest->priority / smallest->remaining_cycles;
+        if (compare_floats(priority_right, priority_smallest) ? right->priority < smallest->priority : priority_right < priority_smallest) {
+            smallest = right;
+        }
+    }*/
+    /*if (left != NULL && (left->priority < smallest->priority || (left->priority == smallest->priority && left->remaining_cycles < smallest->remaining_cycles))) {
+        smallest = left;
+    }
+    if (right != NULL && (right->priority < smallest->priority || (right->priority == smallest->priority && right->remaining_cycles < smallest->remaining_cycles))) {
+        smallest = right;
+    }
+    if (smallest != root) {
+        if (smallest != left || (smallest == left && compare_floats((float)left->priority / left->remaining_cycles, (float)root->priority / root->remaining_cycles) ? left->priority < root->priority : (float)left->priority / left->remaining_cycles < (float)root->priority / root->remaining_cycles)){
+            unsigned int temp_priority = root->priority;
+            root->priority = smallest->priority;
+            smallest->priority = temp_priority;
+            int temp_cycles = root->remaining_cycles;
+            root->remaining_cycles = smallest->remaining_cycles;
+            smallest->remaining_cycles = temp_cycles;
+            unsigned int temp_pid = root->pid;
+            root->pid = smallest->pid;
+            smallest->pid = temp_pid;
+            minHeapify(smallest);}
+    }*/
+    while (current != NULL) {
+        struct task_struct* smallest = current;
+
+        struct task_struct* left = current->next;
+        struct task_struct* right = left != NULL ? left->next : NULL;
+
+        // Find the smallest based on priority/remaining_cycles
+        if (left != NULL && (left->priority < smallest->priority || (left->priority == smallest->priority && left->remaining_cycles < smallest->remaining_cycles))) {
+            smallest = left;
+        }
+
+        if (right != NULL && (right->priority < smallest->priority || (right->priority == smallest->priority && right->remaining_cycles < smallest->remaining_cycles))) {
+            smallest = right;
+        }
+
+        // If the smallest is not the current node, swap them
+        if (smallest != current) {
+            // Swap values (priority, remaining cycles, and pid)
+            unsigned int temp_priority = current->priority;
+            current->priority = smallest->priority;
+            smallest->priority = temp_priority;
+
+            int temp_cycles = current->remaining_cycles;
+            current->remaining_cycles = smallest->remaining_cycles;
+            smallest->remaining_cycles = temp_cycles;
+
+            unsigned int temp_pid = current->pid;
+            current->pid = smallest->pid;
+            smallest->pid = temp_pid;
+
+            current = smallest;
+        } else {break;}}
+}
+
+void buildMinHeap() {   
+    int i;
+    struct task_struct* current;
+    for (i = size() / 2 - 1; i >= 0; i--) {
+    current = head;
+        for (int j = 0; j < i; j++) {
+            current = current->next;
+        }
+        minHeapify(current);
+    }
+}
+
+void schedule() {
+     buildMinHeap();
 } // end schedule() function
 
 // ------------------------------------
